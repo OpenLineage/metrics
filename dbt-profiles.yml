@@ -5,9 +5,8 @@ openlineage:
       type: bigquery
       method: service-account
       keyfile: "{{ env_var('HOME') + '/.dbt/openlineage.json' }}"
-      
-      project: metrics
-      dataset: ecosystem
+      project: openlineage
+      dataset: metrics
       threads: 1
       timeout_seconds: 300
       location: US

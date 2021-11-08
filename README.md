@@ -53,7 +53,7 @@ pip3 install dbt openlineage-dbt
 Each of the loaders should work if you have the correct key in `~/.dbt/openlineage.yaml`.
 
 ```bash
-# loaders/[loader].py
+# loaderscripts/[loader].py
 ```
 
 Set your OPENLINEAGE_KEY, OPENLINEAGE_NAMESPACE, and OPENLINEAGE_URL environment variables:

@@ -6,7 +6,7 @@ set -e
 
 # This is very insecure
 cd /metrics
-for x in loaders/*.py; do
+for x in loaderscripts/*.py; do
     python3 $x
 done
 
