@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: metrics
+    database: openlineage
+    schema: metrics
+    tables:
+      - name: dockerhub_pulls
+      - name: github_stars
+      - name: slack_messages
+  - name: pypi
+    database: bigquery-public-data
+    schema: pypi
+    tables:
+      - name: file_downloads

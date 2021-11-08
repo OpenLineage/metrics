@@ -1,0 +1,14 @@
+openlineage: 
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      keyfile: "{{ env_var('HOME') + '/.dbt/openlineage.json' }}"
+      
+      project: metrics
+      dataset: ecosystem
+      threads: 1
+      timeout_seconds: 300
+      location: US
+      priority: interactive
