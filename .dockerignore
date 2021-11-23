@@ -1,1 +1,4 @@
-virtualenv/
+target/
+dbt_modules/
+logs/
+ol-metrics/

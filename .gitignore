@@ -1,7 +1,4 @@
-
 target/
 dbt_modules/
 logs/
-virtualenv/
-
-datakin-metrics.json
+ol-metrics/

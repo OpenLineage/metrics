@@ -45,8 +45,8 @@ docker run -v ~/.openlineage/auth:/root/.openlineage/auth:ro -v ~/.dbt/openlinea
 Install dbt:
 
 ```bash
-python3 -m venv virtualenv
-source virtualenv/bin/activate
+python3 -m venv ol-metrics
+source ol-metrics/bin/activate
 pip3 install dbt openlineage-dbt
 ```
 
@@ -65,5 +65,7 @@ export OPENLINEAGE_URL=https://localhost:5000
 Run dbt using this command:
 
 ```
+dbt-ol docs generate
+dbt-ol seed
 dbt-ol run
 ```
