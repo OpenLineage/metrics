@@ -17,10 +17,13 @@ from {{ source('pypi', 'file_downloads') }}
 where (
     file.project = 'marquez-python'
     or file.project = 'marquez-airflow'
+    or file.project = 'openlineage-python'
+    or file.project = 'openlineage-integration'
+    or file.project = 'openlineage-dbt'
+    or file.project = 'openlineage-airflow'
 )
 
 -- this is the earliest data that is known in the public dataset
--- we need this for partition elimination
 and timestamp > TIMESTAMP_SECONDS(1549497600)
 
 {% if is_incremental() %}
