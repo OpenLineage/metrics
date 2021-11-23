@@ -4,7 +4,7 @@ openlineage:
     dev:
       type: bigquery
       method: service-account
-      keyfile: "{{ env_var('HOME') + '/.dbt/openlineage.json' }}"
+      keyfile: "{{ env_var('AIRFLOW_HOME') + '/openlineage.json' }}"
       project: openlineage
       dataset: metrics
       threads: 1

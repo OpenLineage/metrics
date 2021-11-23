@@ -1,4 +1,6 @@
-target/
-dbt_modules/
-logs/
-ol-metrics/
+.git
+.ado
+.env
+airflow_settings.yaml
+openlineage.json
+include/dbt/logs

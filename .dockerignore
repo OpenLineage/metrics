@@ -1,4 +1,6 @@
-target/
-dbt_modules/
+.astro
+.ado
+.git
+.env
+airflow_settings.yaml
 logs/
-ol-metrics/
