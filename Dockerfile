@@ -1,4 +1,4 @@
-FROM fishtownanalytics/dbt:0.20.1
+FROM fishtownanalytics/dbt:0.21.0
 
 RUN pip install openlineage-dbt google-cloud-bigquery
 
