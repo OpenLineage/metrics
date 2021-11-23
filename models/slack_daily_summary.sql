@@ -1,9 +1,3 @@
-{{
-    config(
-        materialized='view'
-    )
-}}
-
 select
     DATE_TRUNC(DATE(message_time), DAY) AS day,
     domain,

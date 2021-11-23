@@ -1,9 +1,3 @@
-{{
-    config(
-        materialized='table'
-    )
-}}
-
 with combined_stars as (
     select DATE_TRUNC(DATE(timestamp), DAY) AS day, project, stars
     from {{ source('metrics', 'github_stars') }}

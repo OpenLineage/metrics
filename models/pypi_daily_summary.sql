@@ -1,9 +1,3 @@
-{{
-    config(
-        materialized='table'
-    )
-}}
-
 select
     DATE_TRUNC(DATE(timestamp), DAY) AS day,
     project,
@@ -12,4 +6,3 @@ select
 from {{ ref('pypi_downloads') }}
 
 group by day, project, version
-order by day desc

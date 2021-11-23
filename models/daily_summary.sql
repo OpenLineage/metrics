@@ -43,4 +43,3 @@ from github_summary
 left join dockerhub_summary on dockerhub_summary.day = github_summary.day
 left join pypi_summary on pypi_summary.day = github_summary.day
 left join slack_summary on slack_summary.day = github_summary.day
-order by day desc

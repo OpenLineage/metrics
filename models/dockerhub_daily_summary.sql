@@ -11,4 +11,3 @@ select
 from {{ source('metrics', 'dockerhub_pulls') }}
 
 group by day, image
-order by day desc
