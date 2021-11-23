@@ -4,3 +4,5 @@
 airflow_settings.yaml
 openlineage.json
 include/dbt/logs
+include/dbt/.user.yml
+include/dbt/target/run
