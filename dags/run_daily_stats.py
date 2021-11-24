@@ -35,7 +35,7 @@ with DAG(
     def get_docker_stats(**kwargs):
         """Get Docker Hub stats for the given image."""
 
-        response = requests.get('https://hub.docker.com/v2/repositories/' + kwargs['image'])
+        response = requests.get('https://hub.docker.com/v2/repositories/' + kwargs['image'] + '/')
         total_pulls = response.json()['pull_count']
 
         ti = kwargs['ti']
@@ -68,24 +68,6 @@ with DAG(
             op_kwargs={'project': project},
         )
 
-        # load_gh_stats = BigQueryInsertJobOperator(
-        #     task_id='load_github_stats_' + shortname,
-        #     gcp_conn_id='openlineage',
-        #     configuration={
-        #         "query": {
-        #             "query": '''
-        #                 INSERT `openlineage`.`metrics`.`github_stats` VALUES
-        #                 (
-        #                     CURRENT_TIMESTAMP(),
-        #                     '{{{{ task_instance.xcom_pull(task_ids='get_github_stats_{}', key='project') }}}}',
-        #                     {{{{ task_instance.xcom_pull(task_ids='get_github_stats_{}', key='stars') }}}},
-        #                     {{{{ task_instance.xcom_pull(task_ids='get_github_stats_{}', key='forks') }}}}
-        #                 )
-        #             '''.format(shortname,shortname,shortname),
-        #             "useLegacySql": False,
-        #         }
-        #     },
-        # )
         load_gh_stats = BigQueryExecuteQueryOperator(
             task_id='load_github_stats_' + shortname,
             gcp_conn_id='openlineage',
@@ -115,23 +97,6 @@ with DAG(
             op_kwargs={'image': image},
         )
 
-        # load_dh_stats = BigQueryInsertJobOperator(
-        #     task_id='load_docker_stats_' + shortname,
-        #     gcp_conn_id='openlineage',
-        #     configuration={
-        #         "query": {
-        #             "query": '''
-        #                 INSERT `openlineage`.`metrics`.`dockerhub_stats` VALUES
-        #                 (
-        #                     CURRENT_TIMESTAMP(),
-        #                     '{{{{ task_instance.xcom_pull(task_ids='get_docker_stats_{}', key='project') }}}}',
-        #                     {{{{ task_instance.xcom_pull(task_ids='get_docker_stats_{}', key='total_pulls') }}}}
-        #                 )
-        #             '''.format(shortname,shortname,shortname),
-        #             "useLegacySql": False,
-        #         }
-        #     },
-        # )
         load_dh_stats = BigQueryExecuteQueryOperator(
             task_id='load_docker_stats_' + shortname,
             gcp_conn_id='openlineage',
