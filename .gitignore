@@ -7,3 +7,5 @@ include/dbt/logs
 include/dbt/.user.yml
 include/dbt/target
 !include/dbt/target/catalog.json
+plugins/__pycache__
+

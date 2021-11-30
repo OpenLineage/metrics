@@ -1,14 +1,10 @@
-import requests
 import os
 from datetime import datetime
 
 from airflow import DAG
-from airflow.operators.python import PythonOperator
-from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator
-from airflow_dbt.operators.dbt_operator import (
-    DbtSeedOperator,
-    DbtRunOperator,
-)
+from airflow_dbt.operators.dbt_operator import (DbtSeedOperator, DbtRunOperator)
+
+from http_to_bigquery import HttpToBigQueryOperator
 
 with DAG(
     dag_id='openlineage_metrics',
@@ -17,30 +13,7 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.environ['AIRFLOW_HOME']+'/openlineage.json'
     DBT_DIR=os.environ['AIRFLOW_HOME']+'/include/dbt/'
-
-    def get_github_stats(**kwargs):
-        """Get GitHub stats for the given project."""
-
-        response = requests.get('https://api.github.com/repos/' + kwargs['project'])
-        stars = response.json()['watchers']
-        forks = response.json()['forks']
-
-        ti = kwargs['ti']
-        ti.xcom_push(key='project', value=kwargs['project'])
-        ti.xcom_push(key='stars', value=stars)
-        ti.xcom_push(key='forks', value=forks)
-
-    def get_docker_stats(**kwargs):
-        """Get Docker Hub stats for the given image."""
-
-        response = requests.get('https://hub.docker.com/v2/repositories/' + kwargs['image'] + '/')
-        total_pulls = response.json()['pull_count']
-
-        ti = kwargs['ti']
-        ti.xcom_push(key='project', value=kwargs['image'])
-        ti.xcom_push(key='total_pulls', value=total_pulls)
 
     dbt_seed = DbtSeedOperator(
         task_id='dbt_seed',
@@ -56,34 +29,28 @@ with DAG(
         dir=DBT_DIR,
     )
 
+    os.environ['AIRFLOW_CONN_HTTP_GITHUB'] = 'https://api.github.com'
+
     # Pull stats for these projects
-    projects = ['MarquezProject/marquez', 'OpenLineage/openlineage']
+    projects = ['marquezproject/marquez', 'openlineage/openlineage']
 
     for project in projects: 
         shortname = project.split('/')[1]
 
-        get_gh_stats = PythonOperator(
-            task_id='get_github_stats_' + shortname,
-            python_callable=get_github_stats,
-            op_kwargs={'project': project},
-        )
-
-        load_gh_stats = BigQueryExecuteQueryOperator(
+        load_gh_stats = HttpToBigQueryOperator(
             task_id='load_github_stats_' + shortname,
+            http_conn_id='http_github',
+            endpoint='/repos/' + project,
+            log_response=True,
             gcp_conn_id='openlineage',
-            use_legacy_sql=False,
-            sql='''
-                INSERT `openlineage`.`metrics`.`github_stats` VALUES
-                (
-                    CURRENT_TIMESTAMP(),
-                    '{{{{ task_instance.xcom_pull(task_ids='get_github_stats_{}', key='project') }}}}',
-                    {{{{ task_instance.xcom_pull(task_ids='get_github_stats_{}', key='stars') }}}},
-                    {{{{ task_instance.xcom_pull(task_ids='get_github_stats_{}', key='forks') }}}}
-                )
-            '''.format(shortname,shortname,shortname),
+            project_id='openlineage',
+            dataset_id='metrics',
+            table_id='github_stats_tmp',
         )
 
-        get_gh_stats >> load_gh_stats >> dbt_seed 
+        load_gh_stats >> dbt_seed 
+
+    os.environ['AIRFLOW_CONN_HTTP_DOCKER'] = 'https://hub.docker.com'
 
     # Pull stats for these images
     images = ['marquezproject/marquez', 'marquezproject/marquez-web']
@@ -91,26 +58,17 @@ with DAG(
     for image in images:
         shortname = image.split('/')[1]
 
-        get_dh_stats = PythonOperator(
-            task_id='get_docker_stats_' + shortname,
-            python_callable=get_docker_stats,
-            op_kwargs={'image': image},
-        )
-
-        load_dh_stats = BigQueryExecuteQueryOperator(
+        load_dh_stats = HttpToBigQueryOperator(
             task_id='load_docker_stats_' + shortname,
+            http_conn_id='http_docker',
+            endpoint='/v2/repositories/' + image + '/',
+            log_response=True,
             gcp_conn_id='openlineage',
-            use_legacy_sql=False,
-            sql='''
-                INSERT `openlineage`.`metrics`.`dockerhub_stats` VALUES
-                (
-                    CURRENT_TIMESTAMP(),
-                    '{{{{ task_instance.xcom_pull(task_ids='get_docker_stats_{}', key='project') }}}}',
-                    {{{{ task_instance.xcom_pull(task_ids='get_docker_stats_{}', key='total_pulls') }}}}
-                )
-            '''.format(shortname,shortname,shortname),
+            project_id='openlineage',
+            dataset_id='metrics',
+            table_id='docker_stats_tmp',
         )
 
-        get_dh_stats >> load_dh_stats >> dbt_seed
+        load_dh_stats >> dbt_seed 
 
     dbt_seed >> dbt_run
