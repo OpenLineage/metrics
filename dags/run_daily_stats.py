@@ -47,7 +47,7 @@ with DAG(
             table_id='github_stats_snapshot',
         )
 
-        load_gh_stats >> dbt_seed 
+        load_gh_stats >> dbt_run
 
     os.environ['AIRFLOW_CONN_HTTP_DOCKER'] = 'https://hub.docker.com'
 
@@ -67,6 +67,6 @@ with DAG(
             table_id='dockerhub_stats_snapshot',
         )
 
-        load_dh_stats >> dbt_seed 
+        load_dh_stats >> dbt_run
 
     dbt_seed >> dbt_run
