@@ -41,11 +41,10 @@ with DAG(
             task_id='load_github_stats_' + shortname,
             http_conn_id='http_github',
             endpoint='/repos/' + project,
-            log_response=True,
             gcp_conn_id='openlineage',
             project_id='openlineage',
             dataset_id='metrics',
-            table_id='github_stats_tmp',
+            table_id='github_stats_snapshot',
         )
 
         load_gh_stats >> dbt_seed 
@@ -62,11 +61,10 @@ with DAG(
             task_id='load_docker_stats_' + shortname,
             http_conn_id='http_docker',
             endpoint='/v2/repositories/' + image + '/',
-            log_response=True,
             gcp_conn_id='openlineage',
             project_id='openlineage',
             dataset_id='metrics',
-            table_id='docker_stats_tmp',
+            table_id='dockerhub_stats_snapshot',
         )
 
         load_dh_stats >> dbt_seed 

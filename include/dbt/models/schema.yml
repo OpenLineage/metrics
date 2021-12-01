@@ -5,8 +5,8 @@ sources:
     database: openlineage
     schema: metrics
     tables:
-      - name: dockerhub_stats
-      - name: github_stats
+      - name: dockerhub_stats_snapshot
+      - name: github_stats_snapshot
       - name: slack_messages
   - name: pypi
     database: bigquery-public-data

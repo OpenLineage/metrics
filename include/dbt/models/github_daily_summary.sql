@@ -4,9 +4,9 @@
     )
 }}
 
-with combined_stars as (
+with combined_stats as (
     select DATE_TRUNC(DATE(timestamp), DAY) AS day, project, stars, forks
-    from {{ source('metrics', 'github_stats') }}
+    from {{ ref('github_stats') }}
     union all
     select *, null as forks from {{ ref('github_daily_summary_history') }}
 )
@@ -16,5 +16,5 @@ select
     project,
     max(stars) AS stars,
     max(forks) AS forks
-from combined_stars
+from combined_stats
 group by day, project

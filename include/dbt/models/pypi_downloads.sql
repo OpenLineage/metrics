@@ -23,7 +23,7 @@ where (
     or file.project = 'openlineage-airflow'
 )
 
--- this is the earliest data that is known in the public dataset
+-- this is the earliest known data in the dataset
 and timestamp > TIMESTAMP_SECONDS(1549497600)
 
 {% if is_incremental() %}

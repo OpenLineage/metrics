@@ -47,3 +47,8 @@ seeds:
         day: date
         domain: string
         messages: integer
+    dockerhub_daily_summary_history:
+      +column_types:
+        day: date
+        image: string
+        pull_count: integer
