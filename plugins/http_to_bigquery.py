@@ -1,12 +1,17 @@
 
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Dict, Optional, Type, List
 from requests.auth import AuthBase, HTTPBasicAuth
-from datetime import datetime
+import logging
+import traceback
 
 from airflow.models import BaseOperator
 from airflow.providers.http.hooks.http import HttpHook
 from airflow.utils.operator_helpers import make_kwargs_callable
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
+
+from openlineage.common.provider.bigquery import BigQueryDatasetsProvider, BigQueryErrorRunFacet
+from openlineage.airflow.extractors.base import BaseExtractor, TaskMetadata
+from openlineage.airflow.utils import get_job_name
 
 class HttpToBigQueryOperator(BaseOperator):
     """
@@ -67,7 +72,7 @@ class HttpToBigQueryOperator(BaseOperator):
 
     template_fields_renderers = {'headers': 'json', 'data': 'py'}
     template_ext = ()
-    ui_color = '#f4a460'
+    ui_color = '#303378'
 
     def __init__(
         self,
@@ -150,19 +155,75 @@ class HttpToBigQueryOperator(BaseOperator):
             },
         )
 
-        currentTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.log.info('Insertng row into table %s', self.table_id,)
 
-        self.log.info('Insertng row into table %s for datestamp %s', self.table_id, currentTime)
-
-        self.hook.insert_all(
-            dataset_id=self.dataset_id,
-            project_id=self.project_id,
-            table_id=self.table_id,
-            rows=[(currentTime, responseText)]
+        # TODO: replace with insert_job()
+        job_id = self.hook.run_query(
+            sql="""
+                INSERT `{}.{}.{}` VALUES (CURRENT_TIMESTAMP(), @responseText)
+            """.format(self.project_id, self.dataset_id, self.table_id),
+            write_disposition='WRITE_APPEND',
+            query_params=[{
+                'name': 'responseText',
+                'parameterType': { 'type': 'STRING' },
+                'parameterValue': { 'value': responseText }
+            }],
+            use_legacy_sql=False,
         )
+
+        context['task_instance'].xcom_push(key='job_id', value=job_id)
 
     def on_kill(self) -> None:
         super().on_kill()
         if self.hook is not None:
             self.log.info('Cancelling running query')
             self.hook.cancel_query()
+
+
+class HttpToBigQueryExtractor(BaseExtractor):
+    def __init__(self, operator):
+        super().__init__(operator)
+
+    @classmethod
+    def get_operator_classnames(cls) -> List[str]:
+        return ['HttpToBigQueryOperator']
+
+    def extract(self) -> Optional[TaskMetadata]:
+        return None
+
+    def extract_on_complete(self, task_instance) -> Optional[TaskMetadata]:
+        self.log.debug(f"extract_on_complete({task_instance})")
+
+        try:
+            bigquery_job_id = self._get_xcom_bigquery_job_id(task_instance)
+            if bigquery_job_id is None:
+                raise Exception("Xcom could not resolve BigQuery job id." +
+                                "Job may have failed.")
+        except Exception as e:
+            self.log.error(f"Cannot retrieve job details from BigQuery.Client. {e}",
+                     exc_info=True)
+            return TaskMetadata(
+                name=get_job_name(task=self.operator),
+                run_facets={
+                    "bigQuery_error": BigQueryErrorRunFacet(
+                        clientError=f"{e}: {traceback.format_exc()}"
+                    )
+                }
+            )
+
+        stats = BigQueryDatasetsProvider().get_facets(bigquery_job_id)
+        output = stats.output
+        run_facets = stats.run_facets
+
+        return TaskMetadata(
+            name=get_job_name(task=self.operator),
+            outputs=[output.to_openlineage_dataset()] if output else [],
+            run_facets=run_facets
+        )
+
+    def _get_xcom_bigquery_job_id(self, task_instance):
+        bigquery_job_id = task_instance.xcom_pull(
+            task_ids=task_instance.task_id, key='job_id')
+
+        self.log.info(f"bigquery_job_id: {bigquery_job_id}")
+        return bigquery_job_id
