@@ -3,11 +3,21 @@ openlineage:
   outputs:
     dev:
       type: bigquery
-      method: service-account
-      keyfile: "{{ env_var('AIRFLOW_HOME') + '/openlineage.json' }}"
+      method: service-account-json
       project: openlineage
       dataset: metrics
-      threads: 1
+      threads: 2
       timeout_seconds: 300
       location: US
       priority: interactive
+      keyfile_json:
+        type: service_account
+        project_id: openlineage
+        private_key_id: "{{ fromjson(env_var('DBT_ENV_SECRET_BQ_OPENLINEAGE'))['private_key_id'] }}"
+        private_key: "{{ fromjson(env_var('DBT_ENV_SECRET_BQ_OPENLINEAGE'))['private_key'] }}"
+        client_email: "{{ fromjson(env_var('DBT_ENV_SECRET_BQ_OPENLINEAGE'))['client_email'] }}"
+        client_id: "{{ fromjson(env_var('DBT_ENV_SECRET_BQ_OPENLINEAGE'))['client_id'] }}"
+        auth_uri: "{{ fromjson(env_var('DBT_ENV_SECRET_BQ_OPENLINEAGE'))['auth_uri'] }}"
+        token_uri: "{{ fromjson(env_var('DBT_ENV_SECRET_BQ_OPENLINEAGE'))['token_uri'] }}"
+        auth_provider_x509_cert_url: "{{ fromjson(env_var('DBT_ENV_SECRET_BQ_OPENLINEAGE'))['auth_provider_x509_cert_url'] }}"
+        client_x509_cert_url: "{{ fromjson(env_var('DBT_ENV_SECRET_BQ_OPENLINEAGE'))['client_x509_cert_url'] }}"

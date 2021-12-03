@@ -4,24 +4,16 @@ This repository contains an Airflow project designed for use with the Astro CLI,
 
 ## Setup
 
-1. Copy the service account JSON key into `openlineage.json`:
+1. Copy the `.env.example` file to `.env`:
 
 ```bash
-cat > openlineage.json
-[paste]
-^D
+cp .env.example .env
 ```
 
-2. Copy the `.env-example` file to `.env` and edit it with your `OPENLINEAGE_URL` and `OPENLINEAGE_API_KEY` values.
-
-```bash
-cat > ~/.openlineage/auth
-OPENLINEAGE_URL=https://localhost:5000
-```
+2. Edit the .env file with your `OPENLINEAGE_URL` and `OPENLINEAGE_API_KEY` values. Paste the BigQuery JSON key on a single line where indicated.
 
 3. Start up the Astro dev environment:
 
 ```
 astro dev start
 ```
-
