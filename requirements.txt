@@ -1,4 +1,8 @@
 openlineage-airflow
-dbt
+dbt-core
+dbt-postgres
+dbt-redshift
+dbt-snowflake
+dbt-bigquery
 airflow-dbt
 openlineage-dbt
