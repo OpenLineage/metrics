@@ -5,4 +5,5 @@ dbt-redshift
 dbt-snowflake
 dbt-bigquery
 airflow-dbt
+apache-airflow-providers-google
 openlineage-dbt

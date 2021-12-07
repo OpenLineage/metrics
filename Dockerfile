@@ -1,3 +1,3 @@
-FROM quay.io/astronomer/ap-airflow:2.2.2-buster-onbuild
+FROM quay.io/astronomer/astro-runtime:4.0.6
 ENV AIRFLOW__LINEAGE__BACKEND=openlineage.lineage_backend.OpenLineageBackend
 ENV OPENLINEAGE_EXTRACTOR_HttpToBigQueryOperator=http_to_bigquery.HttpToBigQueryExtractor
