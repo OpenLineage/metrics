@@ -8,7 +8,7 @@ from http_to_bigquery import HttpToBigQueryOperator
 
 with DAG(
     dag_id='openlineage_metrics',
-    schedule_interval=None,
+    schedule_interval='0 */6 * * *',
     start_date=datetime(2021, 1, 1),
     catchup=False,
 ) as dag:
