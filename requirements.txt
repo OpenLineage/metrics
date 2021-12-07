@@ -1,9 +1,5 @@
 openlineage-airflow
-dbt-core
-dbt-postgres
-dbt-redshift
-dbt-snowflake
-dbt-bigquery
+dbt==0.21.1
 airflow-dbt
 apache-airflow-providers-google
 openlineage-dbt
