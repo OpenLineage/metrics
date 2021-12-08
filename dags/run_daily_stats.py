@@ -28,8 +28,6 @@ with DAG(
         profiles_dir=DBT_DIR,
         dir=DBT_DIR,
     )
-
-    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.environ['AIRFLOW_HOME']+'/openlineage.json'
  
     os.environ['AIRFLOW_CONN_HTTP_GITHUB'] = 'https://api.github.com'
 
