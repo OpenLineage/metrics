@@ -32,7 +32,7 @@ with DAG(
     os.environ['AIRFLOW_CONN_HTTP_GITHUB'] = 'https://api.github.com'
 
     # Pull stats for these projects
-    projects = ['marquezproject/marquez', 'openlineage/openlineage']
+    projects = ['marquezproject/marquez', 'openlineage/openlineage', 'apache/airflow']
 
     for project in projects: 
         shortname = project.split('/')[1]
@@ -52,7 +52,7 @@ with DAG(
     os.environ['AIRFLOW_CONN_HTTP_DOCKER'] = 'https://hub.docker.com'
 
     # Pull stats for these images
-    images = ['marquezproject/marquez', 'marquezproject/marquez-web']
+    images = ['marquezproject/marquez', 'marquezproject/marquez-web', 'apache/airflow']
 
     for image in images:
         shortname = image.split('/')[1]

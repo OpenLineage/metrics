@@ -21,10 +21,11 @@ where (
     or file.project = 'openlineage-integration'
     or file.project = 'openlineage-dbt'
     or file.project = 'openlineage-airflow'
+    or file.project like '%apache-airflow%'
 )
 
 -- this is the earliest known data in the dataset
-and timestamp > TIMESTAMP_SECONDS(1549497600)
+and timestamp > TIMESTAMP_SECONDS(1493611200)
 
 {% if is_incremental() %}
   and timestamp > (select max(timestamp) from {{ this }})

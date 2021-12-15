@@ -6,7 +6,7 @@ openlineage:
       method: service-account-json
       project: openlineage
       dataset: metrics
-      threads: 2
+      threads: 3
       timeout_seconds: 300
       location: US
       priority: interactive
