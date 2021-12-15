@@ -173,10 +173,14 @@ day,project,stars
 2021-09-14,OpenLineage/OpenLineage,478
 2021-09-13,MarquezProject/marquez,769
 2021-09-13,OpenLineage/OpenLineage,475
+2021-09-12,MarquezProject/marquez,768
+2021-09-12,OpenLineage/OpenLineage,473
 2021-09-11,MarquezProject/marquez,766
 2021-09-11,OpenLineage/OpenLineage,471
 2021-09-10,MarquezProject/marquez,766
 2021-09-10,OpenLineage/OpenLineage,471
+2021-09-09,MarquezProject/marquez,765
+2021-09-09,OpenLineage/OpenLineage,469
 2021-09-08,MarquezProject/marquez,763
 2021-09-08,OpenLineage/OpenLineage,468
 2021-09-07,MarquezProject/marquez,763
@@ -2735,6 +2739,7 @@ day,project,stars
 2018-12-31,apache/airflow,10016
 2018-12-30,apache/airflow,10013
 2018-12-29,apache/airflow,10011
+2018-12-28,apache/airflow,10010
 2018-12-27,apache/airflow,10009
 2018-12-26,apache/airflow,9995
 2018-12-25,apache/airflow,9987
